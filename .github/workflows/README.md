@@ -1,0 +1,1 @@
+[![CI/CD](https://github.com/huan2301/K4-Day12-2A202601164-NguyenNgocHuan/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/huan2301/K4-Day12-2A202601164-NguyenNgocHuan/actions/workflows/ci-cd.yml)

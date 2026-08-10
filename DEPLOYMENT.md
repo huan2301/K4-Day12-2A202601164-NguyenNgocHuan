@@ -10,17 +10,17 @@
 
 | Mục | Nội dung |
 |-----|----------|
-| Họ và tên | (điền họ tên) |
-| Mã học viên | (điền mã học viên) |
-| Repo | (điền link repo K4-DAY12-...) |
+| Họ và tên | Nguyễn Ngọc Huân |
+| Mã học viên | 2A202601164 |
+| Repo | https://github.com/huan2301/K4-Day12-2A202601164-NguyenNgocHuan |
 
 ## Service
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
-| Platform | Railway / Render / Cloud Run — (điền platform bạn dùng) |
-| Ngày deploy | (điền ngày) |
+| Public URL | https://nemozi.onrender.com/ |
+| Platform | Render |
+| Ngày deploy | 2026/08/10 |
 
 ## Biến Môi Trường Đã Set Trên Cloud
 
@@ -28,9 +28,9 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 
 | Biến | Đã set | Ghi chú |
 |------|--------|---------|
-| `PORT` | ✅ | platform tự gán |
+| `PORT` | ✅ | Render tự gán |
 | `API_TOKEN` | ✅ | đặt trong dashboard, không nằm trong repo |
-| `REDIS_URL` | ✅ | (điền: Redis add-on của platform / Upstash / ...) |
+| `REDIS_URL` | ✅ | redis://red-d9sptuf10e5c73aceuog:6379 |
 | `BUCKET_CAPACITY` | ✅ | 10 |
 | `REFILL_PER_MINUTE` | ✅ | 10 |
 | `DAILY_BUDGET_USD` | ✅ | 1.0 |
@@ -38,22 +38,22 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 
 ## Lệnh Kiểm Tra
 
-Thay `<URL>` bằng Public URL ở trên:
+Thay `https://nemozi.onrender.com/` bằng Public URL ở trên:
 
 ```bash
 # 1. Liveness — mong đợi 200 {"status":"ok"}
-curl -i <URL>/healthz
+curl -i https://nemozi.onrender.com/healthz
 
 # 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
-curl -i <URL>/readyz
+curl -i https://nemozi.onrender.com/readyz
 
 # 3. Không có token — mong đợi 401 kèm header WWW-Authenticate
-curl -i -X POST <URL>/chat \
+curl -i -X POST https://nemozi.onrender.com/chat \
   -H "Content-Type: application/json" \
   -d '{"message":"Hello"}'
 
 # 4. Có token — mong đợi 200 kèm câu trả lời
-curl -i -X POST <URL>/chat \
+curl -i -X POST https://nemozi.onrender.com/chat \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $API_TOKEN" \
   -H "X-Client-Id: sv-test" \
@@ -61,7 +61,7 @@ curl -i -X POST <URL>/chat \
 
 # 5. Rate limit — gọi 15 lần, những lần cuối phải trả 429
 for i in $(seq 1 15); do
-  curl -s -o /dev/null -w "%{http_code} " -X POST <URL>/chat \
+  curl -s -o /dev/null -w "%{http_code} " -X POST https://nemozi.onrender.com/chat \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $API_TOKEN" \
     -H "X-Client-Id: sv-test" \
@@ -73,8 +73,84 @@ done; echo
 
 Dán output của các lệnh trên vào đây:
 
+/healthz
 ```
-(điền output)
+$ curl -i https://nemozi.onrender.com/healthz
+HTTP/1.1 200 OK
+Date: Mon, 10 Aug 2026 10:37:40 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+rndr-id: d571c907-d6b7-4c2c
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+CF-RAY: a28e5dd6db35fd71-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"status":"ok","service":"day12-chat-service","version":"1.0.0"}
+```
+/readyz
+```
+$ curl -i https://nemozi.onrender.com/readyz
+HTTP/1.1 200 OK
+Date: Mon, 10 Aug 2026 10:38:11 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+rndr-id: 1d47a91b-bc9a-424a
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+CF-RAY: a28e5e97dd01fd38-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"status":"ready","redis":true}
+```
+/chat không có token
+```
+$ curl -i -X POST https://nemozi.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello"}'
+HTTP/1.1 401 Unauthorized
+Date: Mon, 10 Aug 2026 10:38:42 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+rndr-id: 508c09cd-1b4f-48b9
+Server: cloudflare
+vary: Accept-Encoding
+www-authenticate: Bearer
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+CF-RAY: a28e5f5d2debff82-SIN
+alt-svc: h3=":443"; ma=86400
+
+{"detail":"invalid or missing bearer token"}
+```
+/chat có token
+```
+$ curl -i -X POST https://nemozi.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $API_TOKEN" \
+  -H "X-Client-Id: sv-test" \
+  -d '{"message":"Deploy là gì?"}'
+HTTP/1.1 400 Bad Request
+Date: Mon, 10 Aug 2026 10:39:37 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+rndr-id: 39369b0a-8e24-4b2b
+Server: cloudflare
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+CF-RAY: a28e60b119d22f3c-HKG
+alt-svc: h3=":443"; ma=86400
+
+{"detail":"There was an error parsing the body"}
 ```
 
 ## Ảnh Chụp Màn Hình
@@ -96,7 +172,3 @@ Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng
 4. Chạy `pytest tests/test_cp5.py -v` — bộ test sẽ tự chuyển sang kiểm tra
    `http://localhost:8000`
 5. Ghi rõ lý do không deploy được vào phần dưới đây:
-
-```
-(điền lý do nếu dùng phương án dự phòng, ngược lại xóa mục này)
-```
