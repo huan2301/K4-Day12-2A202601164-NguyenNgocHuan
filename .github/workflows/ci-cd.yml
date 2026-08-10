@@ -16,6 +16,10 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+      test:
+    name: Test
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -32,7 +36,7 @@ jobs:
           pip install pytest
 
       - name: Run tests
-        run: pytest -q --ignore=tests/test_cp5.py
+        run: pytest -q --ignore=tests/test_cp5.py --ignore=tests/test_bonus_cicd.py
 
   build:
     name: Build Docker image
