@@ -23,6 +23,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+screenshots/
 
 # --- Virtual Environments ---
 .venv/
